@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from .models import AuctionVehicle, FuelingRecord, MaintenanceJob, User, Vehicle, FuelRequest, MaintRequest, Route, Driver
 
 class UserSerializer(serializers.ModelSerializer):
@@ -7,7 +7,16 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'middle_name', 'last_name', 'password', 'email', 'gov_id', 'phone', 'address', 'position']
+
     def create(self, validated_data):
+        # Access the request object
+        request = self.context.get('request')
+        
+        # Check if the request user's position is 'Administration Staff'
+        if not request.user.position == 'Administration Staff':
+            raise exceptions.PermissionDenied("Only Administration Staff can register new users.")
+
+        # Rest of the registration logic
         user = User(
             email=validated_data['email'],
             first_name=validated_data['first_name'],
