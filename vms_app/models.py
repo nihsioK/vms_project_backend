@@ -72,7 +72,6 @@ class Vehicle(models.Model):
     MODEL = models.CharField(max_length=50)
     YEAR = models.IntegerField()
     LIC_PLATE = models.CharField(max_length=20, unique=True)
-    DRIVER_ID = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     TYPE = models.CharField(max_length=50)
     MILEAGE = models.FloatField()
     USED_TIME = models.DurationField()
@@ -81,13 +80,13 @@ class Vehicle(models.Model):
 
 class FuelRequest(models.Model):
     REG_ID = models.AutoField(primary_key=True)
-    DRIVER_ID = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    VEHICLE_ID = models.ForeignKey(Vehicle, on_delete=models.CASCADE, null=True)
+    DRIVER_ID = models.ForeignKey(User, on_delete=models.CASCADE)
+    VEHICLE_ID = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     STATUS = models.CharField(max_length=50)
 
 class MaintRequest(models.Model):   
     VEHICLE_ID = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    DRIVER_ID = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    DRIVER_ID = models.ForeignKey(User, on_delete=models.CASCADE)
     STATUS = models.CharField(max_length=50)
 
 class Route(models.Model):
@@ -105,7 +104,7 @@ class Route(models.Model):
 #TypeError: SET_NULL() missing 4 required positional arguments: 'collector', 'field', 'sub_objs', and 'using solve
 
 class Driver(models.Model):
-    DRIVER_ID = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    DRIVER_ID = models.ForeignKey(User, on_delete=models.CASCADE)
     VEHICLE_ID = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
 
 class AuctionVehicle(models.Model):
@@ -115,7 +114,7 @@ class AuctionVehicle(models.Model):
     status = models.CharField(max_length=50)
     description = models.TextField()
     starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='auction_images/')
+    image = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.make} {self.model} {self.year}"
@@ -129,7 +128,7 @@ class MaintenanceJob(models.Model):
     status_choices = [('Active', 'Active'), ('Non-Active', 'Non-Active')]
     status = models.CharField(max_length=20, choices=status_choices)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    replaced_part_image = models.ImageField(upload_to='replaced_parts/')
+    replaced_part_image = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.vehicle} - {self.plate_number}"
@@ -143,8 +142,8 @@ class FuelingRecord(models.Model):
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
     gas_station_name = models.CharField(max_length=100)
     fueling_person_name = models.CharField(max_length=100)
-    before_image = models.ImageField(upload_to='fueling_records/before/')
-    after_image = models.ImageField(upload_to='fueling_records/after/')
+    before_image = models.CharField(max_length=50)
+    after_image = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.vehicle} - {self.date_time}"

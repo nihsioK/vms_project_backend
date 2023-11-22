@@ -1,4 +1,9 @@
+import statistics
+from django.shortcuts import get_object_or_404
+import jwt
 from rest_framework import viewsets
+
+from vms_project import settings
 from .models import AuctionVehicle, FuelingRecord, MaintenanceJob, User, Vehicle, FuelRequest, MaintRequest, Route, Driver
 from .serializers import (AuctionVehicleSerializer, FuelingRecordSerializer, MaintenanceJobSerializer, UserSerializer, VehicleSerializer, FuelRequestSerializer,
                           MaintRequestSerializer, RouteSerializer, DriverSerializer)
@@ -7,7 +12,24 @@ from .serializers import (AuctionVehicleSerializer, FuelingRecordSerializer, Mai
 from .models import Route
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsDriver
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
 
+
+class GetUserByTokenView(APIView):
+    # permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        token = request.META.get('HTTP_AUTHORIZATION', "").split(' ')[1]
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = payload.get('user_id')
+            user = get_user_model().objects.get(id=user_id)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=statistics.HTTP_400_BAD_REQUEST)
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
