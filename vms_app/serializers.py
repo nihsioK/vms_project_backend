@@ -3,7 +3,7 @@ from .models import AuctionVehicle, FuelingRecord, MaintenanceJob, User, Vehicle
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    
+
     class Meta:
         model = User
         fields = ['first_name', 'middle_name', 'last_name', 'password', 'email', 'gov_id', 'phone', 'address', 'position']
@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Access the request object
         request = self.context.get('request')
-        
+
         # Check if the request user's position is 'Administration Staff'
         if not request.user.position == 'Administration Staff':
             raise exceptions.PermissionDenied("Only Administration Staff can register new users.")

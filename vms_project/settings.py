@@ -27,6 +27,14 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    # ... other SIMPLE_JWT settings ...
+}
+
 AUTH_USER_MODEL = 'vms_app.User'
 # Application definition
 
